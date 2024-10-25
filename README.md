@@ -6,4 +6,11 @@ Fork from `https://github.com/gang868/tomatoclock`
 
 使用pyside6替换pyqt
 
+## clock
+
+![clock](./screenshoot/clock.png)
+
+## tomato
+
+![tomato](./screenshoot/tomato.png)
 

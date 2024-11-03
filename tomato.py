@@ -1,4 +1,4 @@
-#!/home/puff/miniconda3/envs/py310/bin/python
+#!/home/puff/App/miniconda3/envs/py310/bin/python
 # -*- coding: utf-8 -*-
 
 '''
@@ -97,7 +97,7 @@ class Tomato(QWidget):
         self.pe.setColor(QPalette.WindowText, Qt.white)
         self.labelRound.setAutoFillBackground(True)
         self.labelRound.setPalette(self.pe)
-        self.labelRound.setFont(QFont("Courier", 20, QFont.Courier))
+        self.labelRound.setFont(QFont("Courier", 20))
 
         vbox.addWidget(self.labelRound)
         # 倒计时显示器

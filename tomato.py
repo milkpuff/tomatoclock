@@ -1,4 +1,4 @@
-#!/home/puff/App/miniconda3/envs/py310/bin/python
+#!/home/puff/miniconda3/envs/py310/bin/python
 # -*- coding: utf-8 -*-
 
 '''
@@ -90,21 +90,19 @@ class Tomato(QWidget):
         # 提示标签
         self.labelRound = QLabel(self)  # 提示标签
         self.labelRound.setText("Ready")
-        self.labelRound.setFixedHeight(50)
+        self.labelRound.setFixedHeight(30)
         self.labelRound.setAlignment(Qt.AlignCenter)
         self.pe = QPalette()
         self.pe.setColor(QPalette.Window, Qt.darkRed)  # 蓝底白字
         self.pe.setColor(QPalette.WindowText, Qt.white)
         self.labelRound.setAutoFillBackground(True)
         self.labelRound.setPalette(self.pe)
-        self.labelRound.setFont(QFont("Courier", 20))
+        self.labelRound.setFont(QFont("Courier", 15))
 
         vbox.addWidget(self.labelRound)
         # 倒计时显示器
         self.clock = QLCDNumber(self)  # 剩余时间显示组件
-        self.clock.display(
-            "%2d:%02d" % (self.second_remain // 60, self.second_remain % 60)
-        )
+        self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
 
         vbox.addWidget(self.clock)
 
@@ -167,13 +165,9 @@ class Tomato(QWidget):
         else:
             self.pe.setColor(QPalette.Window, Qt.darkGreen)
         self.labelRound.setPalette(self.pe)
-        self.labelRound.setText(
-            "Round {0}-{1}".format(self.round + 1, self.current_status)
-        )
+        self.labelRound.setText("Round {0}-{1}".format(self.round + 1, self.current_status))
 
-        self.clock.display(
-            "%2d:%02d" % (self.second_remain // 60, self.second_remain % 60)
-        )
+        self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
         self.tipAction.setText(
             "%s/%d > %2d:%02d"
             % (
@@ -200,9 +194,7 @@ class Tomato(QWidget):
         self.round = 0
         self.second_remain = self.work * self.seconds
         self.current_status = 'Work'
-        self.clock.display(
-            "%2d:%02d" % (self.second_remain // 60, self.second_remain % 60)
-        )
+        self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.timer.stop()
@@ -225,6 +217,7 @@ class Tomato(QWidget):
             self.pe.setColor(QPalette.Window, Qt.darkGreen)
             self.labelRound.setPalette(self.pe)
             self.labelRound.setText('CLOCK')
+            self.labelRound.hide()
             self.clock.setDigitCount(8)
             self.clock.display(datetime.datetime.now().strftime('%H:%M:%S'))
         else:
@@ -232,14 +225,15 @@ class Tomato(QWidget):
             self.show_clock = False
             self.switchButton.setText('Clock')
             self.labelRound.setText("TOMATO")
+            self.labelRound.show()
             self.clock.setDigitCount(5)
-            self.clock.display(
-                "%2d:%02d" % (self.second_remain // 60, self.second_remain % 60)
-            )
+            self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
             self.startButton.setEnabled(True)
             self.stopButton.setEnabled(True)
-            self.timer.stop()
             self.startButton.setText('Start')
+            # 重置 clicked 连接，确保点击一次即开始
+            self.startButton.clicked.disconnect()
+            self.startButton.clicked.connect(self.start)
 
 
 if __name__ == "__main__":

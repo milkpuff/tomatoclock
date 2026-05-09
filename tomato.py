@@ -46,6 +46,7 @@ class Tomato(QWidget):
         self.round_rest = 30  # 1轮4个番茄钟休息30分钟
         self.current_status = "Work"
         self.show_clock = False
+        self.is_tomato_running = False
         self.initUI()
 
     def initUI(self):
@@ -93,7 +94,7 @@ class Tomato(QWidget):
         self.labelRound.setFixedHeight(30)
         self.labelRound.setAlignment(Qt.AlignCenter)
         self.pe = QPalette()
-        self.pe.setColor(QPalette.Window, Qt.darkRed)  # 蓝底白字
+        self.pe.setColor(QPalette.Window, Qt.darkGreen)
         self.pe.setColor(QPalette.WindowText, Qt.white)
         self.labelRound.setAutoFillBackground(True)
         self.labelRound.setPalette(self.pe)
@@ -136,7 +137,7 @@ class Tomato(QWidget):
     def onTimer(self):
         if self.show_clock:
             self.onTimerClock()
-        else:
+        if self.is_tomato_running:
             self.onTimerWork()
 
     def onTimerClock(self):
@@ -167,7 +168,8 @@ class Tomato(QWidget):
         self.labelRound.setPalette(self.pe)
         self.labelRound.setText("Round {0}-{1}".format(self.round + 1, self.current_status))
 
-        self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
+        if not self.show_clock:
+            self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
         self.tipAction.setText(
             "%s/%d > %2d:%02d"
             % (
@@ -184,6 +186,7 @@ class Tomato(QWidget):
             self.timer.start()
         # 设置功能按钮
         # self.startButton.setEnabled(False)
+        self.is_tomato_running = True
         self.stopButton.setEnabled(True)
         self.startButton.setText('Pause')
         self.startButton.clicked.disconnect(self.start)
@@ -191,49 +194,55 @@ class Tomato(QWidget):
         self.onTimerWork()
 
     def stop(self):
+        self.is_tomato_running = False
         self.round = 0
         self.second_remain = self.work * self.seconds
         self.current_status = 'Work'
         self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
-        self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
-        self.timer.stop()
-
-    def pause(self):
         self.startButton.setEnabled(True)
-        self.stopButton.setEnabled(True)
-        self.timer.stop()
         self.startButton.setText('Start')
         self.startButton.clicked.disconnect(self.pause)
         self.startButton.clicked.connect(self.start)
+        self.labelRound.setText('Ready')
+        self.pe.setColor(QPalette.Window, Qt.darkGreen)
+        self.labelRound.setPalette(self.pe)
+        self.labelRound.show()
+
+    def pause(self):
+        self.is_tomato_running = False
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(True)
+        self.startButton.setText('Start')
+        self.startButton.clicked.disconnect(self.pause)
+        self.startButton.clicked.connect(self.start)
+        self.labelRound.setText(f"Round {0}-{1} Pause".format(self.round + 1, self.current_status))
 
     def switch_clock(self):
         if not self.show_clock:  # switch -> clock
             self.startButton.setEnabled(False)
             self.stopButton.setEnabled(False)
             self.switchButton.setText('Tomato')
-            self.timer.start()
             self.show_clock = True
-            self.pe.setColor(QPalette.Window, Qt.darkGreen)
-            self.labelRound.setPalette(self.pe)
-            self.labelRound.setText('CLOCK')
+            # self.pe.setColor(QPalette.Window, Qt.darkGreen)
+            # self.labelRound.setPalette(self.pe)
+            # self.labelRound.setText('CLOCK')
             self.labelRound.hide()
             self.clock.setDigitCount(8)
             self.clock.display(datetime.datetime.now().strftime('%H:%M:%S'))
         else:
-            self.timer.stop()
             self.show_clock = False
             self.switchButton.setText('Clock')
-            self.labelRound.setText("TOMATO")
+            # self.labelRound.setText("TOMATO")
             self.labelRound.show()
             self.clock.setDigitCount(5)
             self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
             self.startButton.setEnabled(True)
             self.stopButton.setEnabled(True)
-            self.startButton.setText('Start')
             # 重置 clicked 连接，确保点击一次即开始
-            self.startButton.clicked.disconnect()
-            self.startButton.clicked.connect(self.start)
+            # self.startButton.setText('Start')
+            # self.startButton.clicked.disconnect()
+            # self.startButton.clicked.connect(self.start)
 
 
 if __name__ == "__main__":

@@ -1,13 +1,6 @@
 #!/home/puff/miniconda3/envs/py310/bin/python
 # -*- coding: utf-8 -*-
 
-'''
-Date: 2018-07-20
-Author: Lin Gang
-Email: gang868@gmail.com
-Description: Tomato alarm clock
-Version: 1.1
-'''
 
 import datetime
 import os
@@ -33,6 +26,7 @@ if os.path.islink(f):
 else:
     path = f
 BASE_DIR = os.path.dirname(path)
+
 
 class Tomato(QWidget):
     def __init__(self):
@@ -184,13 +178,12 @@ class Tomato(QWidget):
         if not self.timer.isActive():
             self.timer.start()
         # 设置功能按钮
-        # self.startButton.setEnabled(False)
         self.tomato_running_status = 'running'
         self.stopButton.setEnabled(True)
         self.startButton.setText('Pause')
         self.startButton.clicked.disconnect(self.start)
         self.startButton.clicked.connect(self.pause)
-        self.onTimerWork()
+        self.labelRound.setText("Round {0}-{1}".format(self.round + 1, self.current_status))
 
     def stop(self):
         self.tomato_running_status = 'stop'
@@ -201,7 +194,7 @@ class Tomato(QWidget):
         self.stopButton.setEnabled(False)
         self.startButton.setEnabled(True)
         self.startButton.setText('Start')
-        self.startButton.clicked.disconnect(self.pause)
+        self.startButton.clicked.disconnect()
         self.startButton.clicked.connect(self.start)
         self.labelRound.setText('Ready')
         self.pe.setColor(QPalette.Window, Qt.darkGreen)

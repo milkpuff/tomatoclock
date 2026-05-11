@@ -34,7 +34,6 @@ else:
     path = f
 BASE_DIR = os.path.dirname(path)
 
-
 class Tomato(QWidget):
     def __init__(self):
         super().__init__()
@@ -46,7 +45,7 @@ class Tomato(QWidget):
         self.round_rest = 30  # 1轮4个番茄钟休息30分钟
         self.current_status = "Work"
         self.show_clock = False
-        self.is_tomato_running = False
+        self.tomato_running_status = 'stop'  # running, paused, stop
         self.initUI()
 
     def initUI(self):
@@ -137,7 +136,7 @@ class Tomato(QWidget):
     def onTimer(self):
         if self.show_clock:
             self.onTimerClock()
-        if self.is_tomato_running:
+        if self.tomato_running_status == 'running':
             self.onTimerWork()
 
     def onTimerClock(self):
@@ -186,7 +185,7 @@ class Tomato(QWidget):
             self.timer.start()
         # 设置功能按钮
         # self.startButton.setEnabled(False)
-        self.is_tomato_running = True
+        self.tomato_running_status = 'running'
         self.stopButton.setEnabled(True)
         self.startButton.setText('Pause')
         self.startButton.clicked.disconnect(self.start)
@@ -194,7 +193,7 @@ class Tomato(QWidget):
         self.onTimerWork()
 
     def stop(self):
-        self.is_tomato_running = False
+        self.tomato_running_status = 'stop'
         self.round = 0
         self.second_remain = self.work * self.seconds
         self.current_status = 'Work'
@@ -210,10 +209,10 @@ class Tomato(QWidget):
         self.labelRound.show()
 
     def pause(self):
-        self.is_tomato_running = False
+        self.tomato_running_status = 'paused'
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(True)
-        self.startButton.setText('Start')
+        self.startButton.setText('Resume')
         self.startButton.clicked.disconnect(self.pause)
         self.startButton.clicked.connect(self.start)
         self.labelRound.setText(f"Round {0}-{1} Pause".format(self.round + 1, self.current_status))
@@ -224,6 +223,8 @@ class Tomato(QWidget):
             self.stopButton.setEnabled(False)
             self.switchButton.setText('Tomato')
             self.show_clock = True
+            if not self.timer.isActive():
+                self.timer.start()
             # self.pe.setColor(QPalette.Window, Qt.darkGreen)
             # self.labelRound.setPalette(self.pe)
             # self.labelRound.setText('CLOCK')
@@ -233,12 +234,12 @@ class Tomato(QWidget):
         else:
             self.show_clock = False
             self.switchButton.setText('Clock')
-            # self.labelRound.setText("TOMATO")
             self.labelRound.show()
             self.clock.setDigitCount(5)
             self.clock.display("%2d:%02d" % (self.second_remain // 60, self.second_remain % 60))
             self.startButton.setEnabled(True)
-            self.stopButton.setEnabled(True)
+            if self.tomato_running_status in ('paused', 'running'):
+                self.stopButton.setEnabled(True)
             # 重置 clicked 连接，确保点击一次即开始
             # self.startButton.setText('Start')
             # self.startButton.clicked.disconnect()

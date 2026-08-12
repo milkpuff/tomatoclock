@@ -7,7 +7,7 @@ import os
 import sys
 
 from PySide6.QtCore import QTimer, Qt
-from PySide6.QtGui import QAction, QFont, QIcon, QPalette
+from PySide6.QtGui import QAction, QFont, QIcon, QKeySequence, QPalette, QShortcut
 from PySide6.QtWidgets import (
     QApplication,
     QHBoxLayout,
@@ -118,6 +118,10 @@ class Tomato(QWidget):
 
         self.setLayout(vbox)
 
+        # Ctrl+H 快捷键：隐藏/显示下方按钮行（Start/Stop/Clock），窗口大小不变
+        self.hideButtonsShortcut = QShortcut(QKeySequence("Ctrl+H"), self)
+        self.hideButtonsShortcut.activated.connect(self.toggle_buttons)
+
         self.tray.show()
         self.show()
 
@@ -126,6 +130,13 @@ class Tomato(QWidget):
         event.ignore()
         # 点击关闭按钮即隐藏主窗体
         self.hide()
+
+    def toggle_buttons(self):
+        # 切换按钮行（Start/Stop/Clock）的显隐，窗口大小保持不变
+        visible = self.startButton.isVisible()
+        self.startButton.setVisible(not visible)
+        self.stopButton.setVisible(not visible)
+        self.switchButton.setVisible(not visible)
 
     def onTimer(self):
         if self.show_clock:
